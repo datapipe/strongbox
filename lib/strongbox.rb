@@ -1,6 +1,7 @@
 require 'openssl'
 require 'base64'
 
+require 'strongbox/cipher'
 require 'strongbox/lock'
 
 module Strongbox
@@ -50,20 +51,20 @@ module Strongbox
     # Argument 0..-2 contains columns to be encrypted
     def encrypt_with_public_key(*args)
       include InstanceMethods
-      
+
       options = args.delete_at(-1) || {}
-      
+
       unless options.is_a?(Hash)
         args.push(options)
         options = {}
       end
-      
+
       if args.one?
         name = args.first
       else
         return args.each { |name| encrypt_with_public_key(name, options) }
       end
-      
+
       if respond_to?(:class_attribute)
         self.lock_options = {} if lock_options.nil?
       else
